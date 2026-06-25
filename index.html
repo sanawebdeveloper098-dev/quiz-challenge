@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz Challenge</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Decorative Background -->
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="blob blob3"></div>
+
+    <!-- START SCREEN -->
+    <section class="screen active" id="startScreen">
+        <div class="glass-card">
+
+            <div class="logo-badge">
+                🧠
+            </div>
+
+            <h1>Welcome to Quiz Challenge</h1>
+
+            <h3>Sharpen Your Mind, One Question at a Time</h3>
+
+            <p class="hero-text">
+                Take on exciting questions, race against the clock,
+                and discover how much you really know.
+            </p>
+
+            <div class="stats-row">
+
+                <div class="stat-card">
+                    <span>10</span>
+                    <small>Questions</small>
+                </div>
+
+                <div class="stat-card">
+                    <span>30s</span>
+                    <small>Timer</small>
+                </div>
+
+                <div class="stat-card">
+                    <span>✓</span>
+                    <small>Results</small>
+                </div>
+
+            </div>
+
+            <div class="features">
+                <div>✔ Multiple Choice Questions</div>
+                <div>✔ Real-Time Timer</div>
+                <div>✔ Instant Score Analysis</div>
+            </div>
+
+            <button id="startBtn" class="primary-btn">
+                Start Quiz →
+            </button>
+
+        </div>
+    </section>
+
+    <!-- QUESTION SCREEN -->
+    <section class="screen" id="quizScreen">
+
+        <div class="quiz-card">
+
+            <div class="timer" id="timer">
+                30
+            </div>
+
+            <div class="progress" id="progress">
+                Question 1 of 10
+            </div>
+
+            <h2 id="question">
+                Question Text
+            </h2>
+
+            <div id="options" class="options"></div>
+
+            <button id="nextBtn" class="primary-btn hidden">
+                Next Question
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- RESULT SCREEN -->
+    <section class="screen" id="resultScreen">
+
+        <div class="result-card">
+
+            <h1>🎉 Congratulations!</h1>
+
+            <div class="result-score" id="scoreText">
+                0 / 10
+            </div>
+            <div class="circle-wrap">
+ <!-- circle -->
+    <svg width="180" height="180">
+
+        <circle
+            class="bg-circle"
+            cx="90"
+            cy="90"
+            r="70">
+        </circle>
+
+        <circle
+            class="progress-circle"
+            cx="90"
+            cy="90"
+            r="70">
+        </circle>
+
+    </svg>
+
+    <div class="circle-text" id="circleText">
+        0%
+    </div>
+<!-- end -->
+</div>
+
+            <div class="percentage" id="percentage">
+                0%
+            </div>
+
+            <p id="performance">
+                Great Job
+            </p>
+
+            <div class="result-buttons">
+
+                <button id="restartBtn" class="primary-btn">
+                    Restart Quiz
+                </button>
+
+                <button id="backBtn" class="secondary-btn">
+                    Go Back To Start
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
