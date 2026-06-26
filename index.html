@@ -8,50 +8,431 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Challenge</title>
+    <style>
+        :root{
+            --primary:#5f0f40;
+            --secondary:#9c0062;
+            --white:#ffffff;
+            --bg:#f7f1f5;
+            --text:#222222;
+            --shadow:0 15px 35px rgba(0,0,0,.15);
+        }
 
-    <link rel="stylesheet" href="style.css">
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Poppins',sans-serif;
+        }
+
+        body{
+            min-height:100vh;
+            background:var(--bg);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            /* overflow: hidden hataya taaki mobile par scroll ho sake */
+            overflow-x:hidden; 
+            position:relative;
+            padding: 15px; /* Mobile edges ke liye safe padding */
+        }
+
+        .screen{
+            width:100%;
+            max-width:1000px;
+            padding:10px;
+            display:none;
+            animation:fade .6s ease;
+        }
+
+        .screen.active{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        @keyframes fade{
+            from{
+                opacity:0;
+                transform:translateY(20px);
+            }
+            to{
+                opacity:1;
+                transform:translateY(0);
+            }
+        }
+
+        /* BLOBS */
+        .blob{
+            position:absolute;
+            border-radius:50%;
+            filter:blur(10px);
+            z-index: -1; /* Blobs ko background me bheja taaki text par click ho sake */
+        }
+
+        .blob1{
+            width:250px;
+            height:250px;
+            background:#5f0f4040;
+            top:-50px;
+            left:-50px;
+        }
+
+        .blob2{
+            width:300px;
+            height:300px;
+            background:#9c006230;
+            right:-70px;
+            top:100px;
+        }
+
+        .blob3{
+            width:220px;
+            height:220px;
+            background:#5f0f4025;
+            bottom:-50px;
+            left:30%;
+        }
+
+        /* CARDS common styles */
+        .glass-card, .quiz-card, .result-card {
+            width:100%;
+            background:white;
+            box-shadow:var(--shadow);
+        }
+
+        /* START CARD */
+        .glass-card{
+            max-width:800px;
+            text-align:center;
+            padding:50px;
+            border-radius:30px;
+            background:rgba(255,255,255,.15);
+            backdrop-filter:blur(20px);
+        }
+
+        .logo-badge{
+            width:100px;
+            height:100px;
+            margin:auto;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:42px;
+            color:white;
+            background:linear-gradient(135deg,var(--primary),var(--secondary));
+            box-shadow:0 0 30px rgba(156,0,98,.5);
+        }
+
+        .glass-card h1{
+            margin-top:25px;
+            color:var(--primary);
+        }
+
+        .glass-card h3{
+            margin:10px 0;
+            font-weight:500;
+        }
+
+        .hero-text{
+            margin:20px auto;
+            max-width:600px;
+        }
+
+        .stats-row{
+            display:flex;
+            gap:15px;
+            justify-content:center;
+            flex-wrap:wrap;
+            margin:30px 0;
+        }
+
+        .stat-card{
+            background:white;
+            min-width:120px;
+            padding:15px;
+            border-radius:15px;
+            box-shadow:var(--shadow);
+            animation:float 3s ease-in-out infinite;
+            transition:.3s;
+        }
+
+        .stat-card:hover{
+            transform:translateY(-10px) scale(1.05);
+        }
+
+        .stat-card:nth-child(2){
+            animation-delay:.5s;
+        }
+
+        .stat-card:nth-child(3){
+            animation-delay:1s;
+        }
+
+        @keyframes float{
+            0%,100%{
+                transform:translateY(0);
+            }
+            50%{
+                transform:translateY(-12px);
+            }
+        }
+
+        .stat-card span{
+            display:block;
+            font-size:24px;
+            font-weight:700;
+            color:var(--secondary);
+        }
+
+        .features{
+            display:flex;
+            flex-direction:column;
+            gap:10px;
+            margin-bottom:30px;
+        }
+
+        /* BUTTONS */
+        .primary-btn, .secondary-btn{
+            border:none;
+            cursor:pointer;
+            transition:.3s;
+            font-size:16px;
+        }
+
+        .primary-btn{
+            padding:15px 35px;
+            border-radius:50px;
+            color:white;
+            background:linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .primary-btn:hover{
+            transform:translateY(-3px) scale(1.05);
+        }
+
+        .secondary-btn{
+            padding:15px 30px;
+            border-radius:50px;
+            background:white;
+            color:var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .secondary-btn:hover{
+            transform:translateY(-3px);
+        }
+
+        .hidden{
+            display:none;
+        }
+
+        /* QUIZ & RESULT CARD */
+        .quiz-card, .result-card{
+            max-width:700px;
+            padding:40px;
+            border-radius:25px;
+            text-align:center;
+        }
+
+        .timer{
+            width:90px;
+            height:90px;
+            margin:auto;
+            border-radius:50%;
+            color:white;
+            font-size:30px;
+            font-weight:700;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .progress{
+            margin:20px 0;
+            color:var(--secondary);
+            font-weight:600;
+        }
+
+        .options{
+            display:grid;
+            gap:15px;
+            margin:30px 0;
+        }
+
+        .option{
+            padding:15px;
+            border-radius:15px;
+            border:2px solid #ddd;
+            cursor:pointer;
+            transition:.3s;
+            text-align: center; 
+        }
+
+        .option:hover{
+            transform:translateY(-3px);
+            border-color:var(--secondary);
+        }
+
+        .option.selected{
+            background:var(--secondary);
+            color:white;
+            border-color:var(--secondary);
+        }
+
+        .option.correct{
+            background:#22c55e;
+            color:white;
+            border-color:#22c55e;
+        }
+
+        .option.wrong{
+            background:#ef4444;
+            color:white;
+            border-color:#ef4444;
+        }
+
+        /* RESULT */
+        .result-score{
+            font-size:40px;
+            font-weight:700;
+            color:var(--primary);
+            margin:20px 0;
+        }
+
+        .percentage{
+            font-size:30px;
+            color:var(--secondary);
+            margin-bottom:15px;
+        }
+
+        .result-buttons{
+            display:flex;
+            justify-content:center;
+            gap:15px;
+            flex-wrap:wrap;
+            margin-top:25px;
+        }
+
+        .circle-wrap{
+            position:relative;
+            width:180px;
+            height:180px;
+            margin:20px auto;
+        }
+
+        .circle-wrap svg{
+            transform:rotate(-90deg);
+        }
+
+        .bg-circle{
+            fill:none;
+            stroke:#eee;
+            stroke-width:12;
+        }
+
+        .progress-circle{
+            fill:none;
+            stroke:#9c0062;
+            stroke-width:12;
+            stroke-linecap:round;
+            stroke-dasharray:440;
+            stroke-dashoffset:440;
+            transition:2s ease;
+        }
+
+        .circle-text{
+            position:absolute;
+            inset:0;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            font-size:34px;
+            font-weight:700;
+            color:#5f0f40;
+        }
+
+        /* --- MOBILE RESPONSIVE MEDIA QUERY --- */
+        @media(max-width:768px){
+            body {
+                padding: 10px;
+                align-items: flex-start; /* Mobile par top se start ho taaki content kate na */
+                padding-top: 30px;
+            }
+
+            .glass-card, .quiz-card, .result-card{
+                padding: 25px 20px; /* Mobile par internal spaces kam kar diye */
+                border-radius: 20px;
+            }
+
+            .glass-card h1{
+                font-size:24px;
+            }
+
+            .stats-row{
+                flex-direction: row; /* Mobile par columns ki jagah neat row banayi */
+                justify-content: space-between;
+                gap: 10px;
+            }
+
+            .stat-card{
+                flex: 1;
+                min-width: 80px;
+                padding: 10px;
+            }
+
+            .stat-card span {
+                font-size: 18px;
+            }
+
+            .result-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .primary-btn, .secondary-btn {
+                width: 100%; /* Mobile buttons full-width responsive */
+                padding: 12px 20px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Decorative Background -->
     <div class="blob blob1"></div>
     <div class="blob blob2"></div>
     <div class="blob blob3"></div>
 
-    <!-- START SCREEN -->
     <section class="screen active" id="startScreen">
         <div class="glass-card">
-
-            <div class="logo-badge">
-                🧠
-            </div>
-
+            <div class="logo-badge">🧠</div>
             <h1>Welcome to Quiz Challenge</h1>
-
             <h3>Sharpen Your Mind, One Question at a Time</h3>
-
             <p class="hero-text">
-                Take on exciting questions, race against the clock,
-                and discover how much you really know.
+                Take on exciting questions, race against the clock, and discover how much you really know.
             </p>
 
             <div class="stats-row">
-
                 <div class="stat-card">
                     <span>10</span>
                     <small>Questions</small>
                 </div>
-
                 <div class="stat-card">
                     <span>30s</span>
                     <small>Timer</small>
                 </div>
-
                 <div class="stat-card">
                     <span>✓</span>
                     <small>Results</small>
                 </div>
-
             </div>
 
             <div class="features">
@@ -60,101 +441,191 @@
                 <div>✔ Instant Score Analysis</div>
             </div>
 
-            <button id="startBtn" class="primary-btn">
-                Start Quiz →
-            </button>
-
+            <button id="startBtn" class="primary-btn">Start Quiz →</button>
         </div>
     </section>
 
-    <!-- QUESTION SCREEN -->
     <section class="screen" id="quizScreen">
-
         <div class="quiz-card">
-
-            <div class="timer" id="timer">
-                30
-            </div>
-
-            <div class="progress" id="progress">
-                Question 1 of 10
-            </div>
-
-            <h2 id="question">
-                Question Text
-            </h2>
-
+            <div class="timer" id="timer">30</div>
+            <div class="progress" id="progress">Question 1 of 10</div>
+            <h2 id="question">Question Text</h2>
             <div id="options" class="options"></div>
-
-            <button id="nextBtn" class="primary-btn hidden">
-                Next Question
-            </button>
-
+            <button id="nextBtn" class="primary-btn hidden">Next Question</button>
         </div>
-
     </section>
 
-    <!-- RESULT SCREEN -->
     <section class="screen" id="resultScreen">
-
         <div class="result-card">
-
             <h1>🎉 Congratulations!</h1>
-
-            <div class="result-score" id="scoreText">
-                0 / 10
-            </div>
+            <div class="result-score" id="scoreText">0 / 10</div>
+            
             <div class="circle-wrap">
- <!-- circle -->
-    <svg width="180" height="180">
-
-        <circle
-            class="bg-circle"
-            cx="90"
-            cy="90"
-            r="70">
-        </circle>
-
-        <circle
-            class="progress-circle"
-            cx="90"
-            cy="90"
-            r="70">
-        </circle>
-
-    </svg>
-
-    <div class="circle-text" id="circleText">
-        0%
-    </div>
-<!-- end -->
-</div>
-
-            <div class="percentage" id="percentage">
-                0%
+                <svg width="180" height="180">
+                    <circle class="bg-circle" cx="90" cy="90" r="70"></circle>
+                    <circle class="progress-circle" cx="90" cy="90" r="70"></circle>
+                </svg>
+                <div class="circle-text" id="circleText">0%</div>
             </div>
 
-            <p id="performance">
-                Great Job
-            </p>
+            <div class="percentage" id="percentage">0%</div>
+            <p id="performance">Great Job</p>
 
             <div class="result-buttons">
-
-                <button id="restartBtn" class="primary-btn">
-                    Restart Quiz
-                </button>
-
-                <button id="backBtn" class="secondary-btn">
-                    Go Back To Start
-                </button>
-
+                <button id="restartBtn" class="primary-btn">Restart Quiz</button>
+                <button id="backBtn" class="secondary-btn">Go Back To Start</button>
             </div>
-
         </div>
-
     </section>
 
-    <script src="script.js"></script>
+    <script>
+        const questions = [
+            { question: "Which language is used for web page structure?", options: ["CSS", "JavaScript", "HTML", "Python"], answer: "HTML" },
+            { question: "Which CSS property changes text color?", options: ["font-size", "color", "background", "border"], answer: "color" },
+            { question: "Which company developed JavaScript?", options: ["Google", "Microsoft", "Netscape", "Apple"], answer: "Netscape" },
+            { question: "Which symbol is used for ID selector in CSS?", options: [".", "#", "@", "&"], answer: "#" },
+            { question: "Which HTML tag creates a hyperlink?", options: ["link", "href", "a", "url"], answer: "a" },
+            { question: "Which method selects an element by ID?", options: ["querySelector", "getElementById", "getElementsByClassName", "findElement"], answer: "getElementById" },
+            { question: "Which CSS layout system is one-dimensional?", options: ["Grid", "Flexbox", "Table", "Float"], answer: "Flexbox" },
+            { question: "Which keyword declares a variable?", options: ["var", "let", "const", "All of these"], answer: "All of these" },
+            { question: "Which HTML tag inserts an image?", options: ["img", "image", "src", "picture"], answer: "img" },
+            { question: "Which operator checks equality?", options: ["=", "==", "===", "Both == and ==="], answer: "Both == and ===" }
+        ];
+
+        const startScreen = document.getElementById("startScreen");
+        const quizScreen = document.getElementById("quizScreen");
+        const resultScreen = document.getElementById("resultScreen");
+        const startBtn = document.getElementById("startBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const timerEl = document.getElementById("timer");
+        const progressEl = document.getElementById("progress");
+        const scoreText = document.getElementById("scoreText");
+        const percentageEl = document.getElementById("percentage");
+        const performanceEl = document.getElementById("performance");
+        const restartBtn = document.getElementById("restartBtn");
+        const backBtn = document.getElementById("backBtn");
+        const circle = document.querySelector(".progress-circle");
+        const circleText = document.getElementById("circleText");
+        const circumference = 440;
+
+        let currentQuestion = 0;
+        let score = 0;
+        let timer = 30;
+        let interval;
+
+        startBtn.addEventListener("click", startQuiz);
+
+        function startQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            circle.style.strokeDashoffset = circumference;
+            circleText.textContent = "0%";
+            startScreen.classList.remove("active");
+            resultScreen.classList.remove("active");
+            quizScreen.classList.add("active");
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            clearInterval(interval);
+            timer = 30;
+            timerEl.textContent = timer;
+            startTimer();
+            nextBtn.classList.add("hidden");
+
+            const q = questions[currentQuestion];
+            progressEl.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+            questionEl.textContent = q.question;
+            optionsEl.innerHTML = "";
+
+            q.options.forEach(option => {
+                const btn = document.createElement("div");
+                btn.classList.add("option");
+                btn.textContent = option;
+
+                btn.addEventListener("click", () => {
+                    clearInterval(interval);
+                    document.querySelectorAll(".option").forEach(opt => opt.style.pointerEvents = "none");
+
+                    if (option === q.answer) {
+                        btn.classList.add("correct");
+                        score++;
+                    } else {
+                        btn.classList.add("wrong");
+                        document.querySelectorAll(".option").forEach(opt => {
+                            if (opt.textContent === q.answer) opt.classList.add("correct");
+                        });
+                    }
+                    nextBtn.classList.remove("hidden");
+                });
+                optionsEl.appendChild(btn);
+            });
+        }
+
+        function startTimer() {
+            interval = setInterval(() => {
+                timer--;
+                timerEl.textContent = timer;
+                if (timer <= 0) {
+                    clearInterval(interval);
+                    document.querySelectorAll(".option").forEach(opt => {
+                        opt.style.pointerEvents = "none";
+                        if (opt.textContent === questions[currentQuestion].answer) opt.classList.add("correct");
+                    });
+                    nextBtn.classList.remove("hidden");
+                }
+            }, 1000);
+        }
+
+        nextBtn.addEventListener("click", nextQuestion);
+
+        function nextQuestion() {
+            clearInterval(interval);
+            currentQuestion++;
+            if (currentQuestion < questions.length) loadQuestion();
+            else showResult();
+        }
+
+        function showResult() {
+            quizScreen.classList.remove("active");
+            resultScreen.classList.add("active");
+
+            const percentage = Math.round((score / questions.length) * 100);
+            scoreText.textContent = `Your Score: ${score} / ${questions.length}`;
+            percentageEl.textContent = `Percentage: ${percentage}%`;
+
+            let message = "";
+            if (percentage >= 90) message = "Excellent 🎯";
+            else if (percentage >= 70) message = "Great Job 🚀";
+            else if (percentage >= 50) message = "Good Effort 👍";
+            else message = "Keep Practicing 📚";
+
+            performanceEl.textContent = message;
+
+            const offset = circumference - (percentage / 100) * circumference;
+            setTimeout(() => { circle.style.strokeDashoffset = offset; }, 150);
+
+            let count = 0;
+            circleText.textContent = "0%";
+            if (percentage > 0) {
+                const counter = setInterval(() => {
+                    count++;
+                    circleText.textContent = count + "%";
+                    if (count >= percentage) clearInterval(counter);
+                }, 15);
+            }
+        }
+
+        restartBtn.addEventListener("click", startQuiz);
+        backBtn.addEventListener("click", () => {
+            resultScreen.classList.remove("active");
+            startScreen.classList.add("active");
+        });
+    </script>
+</body>
+</html>
 
 </body>
 </html>
